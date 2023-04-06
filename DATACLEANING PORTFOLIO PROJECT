@@ -1,0 +1,303 @@
+---DATA CLEANING---
+
+SELECT *
+FROM nashville;
+
+---STANDARDIZE DATE FORMAT---
+
+SELECT SaledateConverted, CONVERT (date,saledate)
+FROM nashville;
+
+UPDATE nashville
+SET saledate = CONVERT(date,saledate);
+
+ALTER TABLE nashville 
+ADD saledateconverted date;
+
+UPDATE nashville 
+SET saledateconverted =CONVERT (date,saledate)
+
+
+----POPULATE PROPERTY ADDRESS DATE ---
+
+SELECT *
+FROM nashville
+WHERE propertyAddress IS NULL
+ORDER BY parcelID;
+
+SELECT a.parcelID, a.propertyAddress,b.parcelID,b.propertyAddress,
+ISNULL,a.propertyAddress,b.propertyAddress
+FROM nashville a
+JOIN nashville b
+ON a.parcelID = b.parcelID
+AND a.uniqueid <> b.uniqueid
+WHERE a.propertyAddress IS NULL;
+
+
+UPDATE a,
+SET propertyAddress = ISNULL(a.propertyAdress, b.propertyAddress)
+FROM nashville a
+JOIN nashville b
+ON a.parcelid <> b.parcelid
+WHERE a.propertyAdress IS NULL;
+
+
+---BREAKING OUT ADDRESS INTO INDIVIDUAL COLUMNS(ADDRESS,CITY,STATE)---
+
+SELECT propertyAddress
+FROM nashville;
+
+SELECT 
+SUBSTRING(propertyAddress,1,CHARINDEX(',', propertyAddress)-1 )AS ADDRESS
+,SUBSTRING (propertyAddress, CHARINDEX(',', propertyAddress)+1, LEN(propertyAddress)) AS ADDRESS
+FROM nashville;		  
+		  
+
+ALTER TABLE nashville 
+ADD propertysplitAddress VARCHAR (255);
+
+UPDATE nashville
+SET propertysplitAddress = SUBSTRING , CHARINDEX (','propertyAddress)-1 );
+
+ALTER TABLE nashville
+ADD propertysplitcity VARCHAR(255);
+
+UPDATE nashville
+SET propertysplitcity =SUBSTRING(propertyAddress,CHARINDEX(',' propertyAddress)+1,LEN(propertyAddress))
+
+SELECT *
+FROM nashville;
+
+SELECT owneraddress
+FROM nashville;
+
+SELECT 
+
+PARSENAME(REPLACE(ownerAddress,',',','),1)
+FROM nashville;
+
+SELECT 
+PARSENAME(REPLACE(ownerAddress,',','.'),3)
+PARSENAME(REPLACE(ownerAddress,',','.'),2)
+PARSENAME(REPLACE(ownerAddress,',','.'),1)
+
+FROM nashville;
+
+ALTER TABLE nashville 
+ADD ownersplitAddress VARCHAR(255)
+
+UPDATE nashville
+SET ownershipAddress = PERSENAME(ownersAddress,',','.','.',3)
+
+
+ALTER TABLE nashville
+ADD ownersplitcity VARCHAR(255); 
+
+UPDATE nashville
+ADD ownershipsplitcity = PERSUNAME(REPLACE(ownerAddress,',','.'),2)
+
+
+ALTER TABLE nashville 
+ADD ownersplitstate VARCHAR (255);
+
+UPDATE nashville
+SET ownersplitstate = PERSENAME(REPLACE(ownerAddress,',','.'),1)
+
+SELECT *
+FROM nashville;
+
+
+---CHANGE Y AND N TO YES AND NO IN SOLD AND VACANT FIELD---
+
+
+SELECT DISTINCT (soldasvacant),COUNT(soldasvacant)
+FROM nashville
+GROUP BY soldasvacant
+ORDER BY 2 ;
+
+SELECT soldasvacant
+,CASE WHEN soldasvacant = 'Y' THEN 'YES'
+     WHEN soldasvacant = 'N'  THEN 'NO'
+     ELSE soldasvacant 
+     END
+FROM nashville ;
+
+
+---REMOVE DUPLICATES----
+
+SELECT *,
+ ROW_NUMBER () OVER (
+ PARTITION BY parcelid,
+     propertyAddress,
+     saleprice,
+     saledate,
+	 legalreference
+	 ORDER BY 
+	 uniqueid
+     )row_num
+FROM nashville
+
+DELETE 
+FROM RowNumCET
+WHERE row_num >1;
+--ORDER BY propertyAddress
+
+
+DELETE UNUSED COLUMNS
+
+SELECT * 
+FROM nashville;
+
+ALTER TABLE nashville
+DROP COLUMN owneraddress,taxdistrict, propertyaddress;
+
+
+ALTER TABLE nashville
+DROP COLUMN saledate;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
